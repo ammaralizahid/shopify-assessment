@@ -1,0 +1,96 @@
+{% layout "template.liquid" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.title | capitalize }}</title>
+
+    <!-- Link to your CSS file -->
+    <link href="{{ 'product-styles.css' | asset_url }}" rel="stylesheet" type="text/css">
+
+    {% block head %}
+    <!-- Additional head elements can be added here -->
+    {% endblock %}
+    <style>
+      /* Add styling directly in the head section */
+      .success-message {
+        display: none;
+        color: green;
+        font-size: 1rem;
+        margin-top: 10px;
+      }
+    </style>
+</head>
+<body>
+    {% block content %}
+    <div class="product-details">
+        <!-- Product Title -->
+        <h1>{{ product.title | capitalize }}</h1>
+        
+        <!-- Product Image -->
+        <div class="product-images">
+            {% if product.images.size > 0 %}
+                <div class="main-image">
+                    <img src="{{ product.featured_image | img_url: 'large' }}" alt="{{ product.title }}">
+                </div>
+                <div class="image-thumbnails">
+                    {% for image in product.images %}
+                        <img src="{{ image | img_url: 'small' }}" alt="{{ product.title }}" class="thumbnail">
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Product Description -->
+        <p class="product-description">{{ product.description | strip_html }}</p>
+        
+        <!-- Product Price -->
+        <p class="product-price">Price: ${{ product.price | divided_by: 100 }}</p>
+        
+        <!-- Compare At Price -->
+        {% if product.compare_at_price > product.price %}
+            <p class="compare-at-price">Original Price: <s>${{ product.compare_at_price | divided_by: 100 }}</s></p>
+        {% endif %}
+
+        <!-- Product Type -->
+        <p class="product-type">Type: {{ product.type }}</p>
+        
+        <!-- Product Vendor -->
+        <p class="product-vendor">Vendor: {{ product.vendor }}</p>
+        
+        <!-- Product Availability -->
+        {% if product.available %}
+            <p class="product-availability">Status: In Stock</p>
+        {% else %}
+            <p class="product-availability">Status: Out of Stock</p>
+        {% endif %}
+        
+        <!-- Product Variants -->
+        {% if product.variants.size > 1 %}
+            <div class="product-variants">
+                <h2 class="variants-title">Available Sizes:</h2>
+                <div class="variants-container">
+                    {% for variant in product.variants %}
+                        <button 
+                          class="variant-button {% if variant.available %}available{% else %}unavailable{% endif %}" 
+                          data-variant-id="{{ variant.id }}"
+                        >
+                          {{ variant.option1 }}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Add to Cart Button -->
+        <button id="add-to-cart" data-variant-id="{{ product.variants.first.id }}">Add to Cart</button>
+        <div class="success-message" id="success-message">Product added to cart successfully!</div>
+    </div>
+    {% endblock %}
+
+    <!-- Include JavaScript for Add to Cart functionality -->
+    <script src="/path/to/your/script.js"></script>
+</body>
+</html>
